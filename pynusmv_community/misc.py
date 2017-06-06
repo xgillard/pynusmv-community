@@ -55,7 +55,7 @@ def short_var_repr(var):
     :param var: the `BeVar` whose short description is desired
     :return: a short string representation of the given variable
     '''
-    return "{}@{}".format(var.name, var.time) if var else '???'
+    return "{}_at_{}".format(var.name, var.time) if var else '???'
 
 ############### CONVERSIONS IGRAPH <--> PYNUSMV ###############################
 

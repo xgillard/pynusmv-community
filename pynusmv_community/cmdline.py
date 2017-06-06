@@ -16,10 +16,17 @@ def arguments():
                       type = str,
                       default = ".",
                       help = "The path to the folder containing the 'main' module")
-    args.add_argument("-k", "--bound",
+    
+    # The time steps to consider
+    args.add_argument("-k", "--min-bound",
+                      type=int,
+                      default=0,
+                      help="The minimal problem size")
+    args.add_argument("-K", "--max-bound",
                       type=int,
                       default=10,
-                      help="The problem bound (max number of steps in a trace)")
+                      help="The maximal problem size")
+    
     args.add_argument("-f", "--formula",
                       help = "A formula to generate the model checking problem")
     # Customization flags

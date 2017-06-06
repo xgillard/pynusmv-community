@@ -24,7 +24,7 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     
         + 'dimacs = True' will produce a *.cnf file containing the dimacs
            representation of the problem
-        + 'struct = True' will produce a *.png file visually representing the 
+        + 'structure = True' will produce a *.png file visually representing the 
            variable graph.
         + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
            community to show the semantic information that occurs the most often
@@ -53,7 +53,7 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
         output.dimacs(model, bound, cnf)
     
     # generate the variable graph if needed
-    if flags.struct:
+    if flags.structure:
         output.structure(model, bound, clusters, graph)
     
     # generate word clouds if needed
@@ -76,7 +76,7 @@ def analyze_all(model, formula = None, depths = range(10), flags = IDLE):
     
         + 'dimacs = True' will produce a *.cnf file containing the dimacs
            representation of the problem
-        + 'struct = True' will produce a *.png file visually representing the 
+        + 'structure = True' will produce a *.png file visually representing the 
            variable graph.
         + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
            community to show the semantic information that occurs the most often
@@ -117,7 +117,7 @@ def process(path_to, model, formula = None, depths = range(10), flags = IDLE):
     
         + 'dimacs = True' will produce a *.cnf file containing the dimacs
            representation of the problem
-        + 'struct = True' will produce a *.png file visually representing the 
+        + 'structure = True' will produce a *.png file visually representing the 
            variable graph.
         + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
            community to show the semantic information that occurs the most often
@@ -139,7 +139,8 @@ def main():
     it can do.
     '''
     args = cmdline.arguments()
-    process(args.path_to, args.model, args.formula, range(args.bound), args)
+    rng  = range(args.min_bound, 1+args.max_bound)
+    process(args.path_to, args.model, args.formula, rng, args)
     
 if __name__ == "__main__":
     main()

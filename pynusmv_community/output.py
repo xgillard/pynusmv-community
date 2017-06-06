@@ -43,10 +43,10 @@ def clouds(model, bound, clusters, graph):
         for s in s_cluster:
             counter += 1
             text = " ".join(s)
-            cloud= WordCloud().generate(text)
-            
-            cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
             print( "{:03d} -> {}".format(counter, text) , file=f )
+            
+            cloud= WordCloud().generate(text)
+            cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
             
 def statistics(model, frames):
     '''
