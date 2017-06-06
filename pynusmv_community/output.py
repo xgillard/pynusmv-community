@@ -38,15 +38,24 @@ def clouds(model, bound, clusters, graph):
     '''
     os.makedirs("{}/clouds/{:03d}".format(model, bound), exist_ok=True)
     s_cluster = [ [misc.vertex_repr(graph, v) for v in c ] for c in clusters ]
+    
+    # DUMP the complete information (containing ???)
     with open("{}/clouds/{:03d}/raw.txt".format(model, bound), 'w') as f:
-        counter = 0
-        for s in s_cluster:
-            counter += 1
-            text = " ".join(s)
-            print( "{:03d} -> {}".format(counter, text) , file=f )
-            
-            cloud= WordCloud().generate(text)
-            cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
+        # But also CURATE the data to make it easier to read
+        with open("{}/clouds/{:03d}/curated.txt".format(model, bound), 'w') as c:
+            counter = 0
+            for s in s_cluster:
+                counter += 1
+                # raw information
+                text = " ".join(sorted(s))
+                print( "{:03d} -> {}\n".format(counter, text) , file=f )
+                
+                # curated info
+                text = " ".join(sorted(filter(lambda x: x!="???", s)))
+                print( "{:03d} -> {}\n".format(counter, text) , file=c )
+                
+                cloud= WordCloud(stopwords={},regexp=r'\w[\[\]\{\}\w]+').generate(text)
+                cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
             
 def statistics(model, frames):
     '''
