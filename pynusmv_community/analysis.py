@@ -8,16 +8,13 @@ from pynusmv.init      import init_nusmv
 from pynusmv.glob      import load
 from pynusmv.bmc.glob  import BmcSupport
 
+from pynusmv_community import cmdline
 from pynusmv_community import misc
 from pynusmv_community import output
 
+IDLE = cmdline.do_nothing_flags()
 
-def analyze_one(
-        model, bound, formula=None, 
-        dimacs= False, # do I want to keep the .cnf file ?
-        draw  = False, # do I want to draw a graph ?
-        clouds= False, # do I want to generate one wordcloud per community 
-        ):
+def analyze_one(model, bound, formula=None, flags = IDLE):
     '''
     Analyzes the `model` for one given depth and one given `formula`. This step
     generates one dataframe of statistics corresponding to a shallow analysis
@@ -27,7 +24,7 @@ def analyze_one(
     
         + 'dimacs = True' will produce a *.cnf file containing the dimacs
            representation of the problem
-        + 'draw   = True' will produce a *.png file visually representing the 
+        + 'struct = True' will produce a *.png file visually representing the 
            variable graph.
         + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
            community to show the semantic information that occurs the most often
@@ -52,15 +49,15 @@ def analyze_one(
     clusters = graph.community_multilevel()
     
     # generate the dimacs instance if needed
-    if dimacs:
+    if flags.dimacs:
         output.dimacs(model, bound, cnf)
     
     # generate the variable graph if needed
-    if draw:
+    if flags.struct:
         output.structure(model, bound, clusters, graph)
     
     # generate word clouds if needed
-    if clouds:
+    if flags.clouds:
         output.clouds(model, bound, clusters, graph)
                 
     return  {
@@ -71,14 +68,7 @@ def analyze_one(
             }
     
 
-def analyze_all(
-        model, 
-        formula  = None, 
-        depths   = range(10),
-        dimacs   = False,
-        draw     = False,
-        clouds   = False,
-        stats    = False):
+def analyze_all(model, formula = None, depths = range(10), flags = IDLE):
     '''
     Repeatedly performs the analysis of `model` for all `depth`. By default,
     this analysis generates no output. However the following flags can be 
@@ -86,7 +76,7 @@ def analyze_all(
     
         + 'dimacs = True' will produce a *.cnf file containing the dimacs
            representation of the problem
-        + 'draw   = True' will produce a *.png file visually representing the 
+        + 'struct = True' will produce a *.png file visually representing the 
            variable graph.
         + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
            community to show the semantic information that occurs the most often
@@ -108,23 +98,15 @@ def analyze_all(
     '''
     frames = []
     for bound in depths:
-        record = analyze_one(model, bound, formula, dimacs, draw, clouds)
+        record = analyze_one(model, bound, formula, flags)
         frames.append( pandas.DataFrame.from_dict(record) )
         
     # gather statistic data
-    if stats:
+    if flags.stats:
         output.statistics(model, frames)
         
 
-def process(
-        path_to,
-        model, 
-        formula  = None, 
-        depths   = range(10),
-        dimacs   = False,
-        draw     = False,
-        clouds   = False,
-        stats    = False):
+def process(path_to, model, formula = None, depths = range(10), flags = IDLE):
     '''
     Initializes PyNuSMV and loads the model, then proceeds to the bulk of the
     analysis. See `analyze_one` and `analyze_all` for further details about 
@@ -135,7 +117,7 @@ def process(
     
         + 'dimacs = True' will produce a *.cnf file containing the dimacs
            representation of the problem
-        + 'draw   = True' will produce a *.png file visually representing the 
+        + 'struct = True' will produce a *.png file visually representing the 
            variable graph.
         + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
            community to show the semantic information that occurs the most often
@@ -149,14 +131,15 @@ def process(
         load(misc.merge_model_text(path_to, model+".smv"))
         
         with BmcSupport():
-            analyze_all(model, formula, depths, dimacs, draw, clouds, stats)
+            analyze_all(model, formula, depths, flags)
             
 def main():
-    # TODO parse command line arguments
-    process("/Users/user//Documents/EXPERIMENTS/bmc_data/models/nameche", 
-            "NMH21_2", 
-            depths = range(3), 
-            draw   = True)
+    '''
+    The main entry point of the tool. See --help for the full details of what
+    it can do.
+    '''
+    args = cmdline.arguments()
+    process(args.path_to, args.model, args.formula, range(args.bound), args)
     
 if __name__ == "__main__":
     main()

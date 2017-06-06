@@ -20,7 +20,7 @@ from setuptools import setup, find_packages
 REQUIREMENTS = [
     'pynusmv',
     'python-igraph',
-    'pycairo',
+    #'pycairo',
     'pandas',
     'matplotlib',
     'wordcloud',
@@ -35,6 +35,11 @@ setup(name             = 'pynusmv-community',
       description      = "Tools to analyze and understand the community structure of BMC instances",
       packages         = find_packages(),
       install_requires = REQUIREMENTS,
+      entry_points     = {
+        'console_scripts' : [
+            'commu=pynusmv_community.analysis:main'
+        ] 
+      },
       # TESTS
       test_suite       = 'nose.collector',
       tests_require    = ['nose'] )
