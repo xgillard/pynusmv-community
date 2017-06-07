@@ -5,6 +5,9 @@ import argparse
 
 from collections import namedtuple 
 
+# Is the verbosity turned on ?
+__VERBOSE = False
+
 def arguments():
     args = argparse.ArgumentParser(description="""
         A tool to analyze the community structure of SAT BMC problem instances
@@ -30,41 +33,52 @@ def arguments():
     args.add_argument("-f", "--formula",
                       help = "A formula to generate the model checking problem")
     # Customization flags
-    args.add_argument("-d", "--dimacs",
-                      #type   = bool,
+    args.add_argument("--dimacs",
                       default= False,
                       action = 'store_true',
                       help   = 'Generate a DIMACS .cnf file for each instance')
-    args.add_argument("-s", "--structure",
-                      #type   = bool,
+    args.add_argument("--structure",
                       default= False,
                       action = 'store_true',
                       help   = 'Generate a variable graph for each instance')
-    args.add_argument("-c", "--clouds",
-                      #type   = bool,
+    args.add_argument("--clouds",
                       default= False,
                       action = 'store_true',
                       help   = 'Generate a word cloud for each community of each instance')
-    args.add_argument("-C", "--communities",
-                      #type   = bool,
+    args.add_argument("--communities",
                       default= False,
                       action = 'store_true',
                       help   = 'Generate 2 files with the communities analyzed (raw and curated)')
-    args.add_argument("-S", "--stats",
-                      #type   = bool,
+    # mining
+    args.add_argument("--mine-patterns",
+                      default= False,
+                      action = 'store_true',
+                      help   = 'Generate one CSV file reporting a mining of the frequent patterns observed')
+    args.add_argument("--mine-sequences",
+                      default= False,
+                      action = 'store_true',
+                      help   = 'Generate one CSV file reporting a mining of the frequent sequences observed')
+    
+    args.add_argument("--stats",
                       default= False,
                       action = 'store_true',
                       help   = 'Generate statistics')
     args.add_argument("-v", "--verbose",
-                      #type   = bool,
                       default= False,
                       action = 'store_true',
                       help   = 'Verbose information during the run')
-    return args.parse_args()
+    
+    parsed = args.parse_args()
+    
+    if parsed.verbose:
+        global __VERBOSE
+        __VERBOSE = True
+    
+    return parsed
 
 def do_nothing_flags():
-    flags = namedtuple('Flags', 'dimacs structure clouds stats')
-    return flags(False, False, False, False)
+    flags = namedtuple('Flags', 'dimacs structure clouds stats mine_patterns mine_sequences')
+    return flags(False, False, False, False, False, False)
     
 def log_verbose(func):
     '''
@@ -72,6 +86,9 @@ def log_verbose(func):
     flags which has an attribute 'verbose' set to true.
     '''
     def logger(*args, **kwargs):
-        print("{} | {} {}".format(func.__name__, *args, **kwargs))
+        global __VERBOSE
+        
+        if __VERBOSE:
+            print("{} | {} {}".format(func.__name__, *args, **kwargs))
         func(*args, **kwargs)
     return logger

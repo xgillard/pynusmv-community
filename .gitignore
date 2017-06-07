@@ -1,3 +1,4 @@
 build/
 dist/
 pynusmv_community.egg-info/
+__pycache__/

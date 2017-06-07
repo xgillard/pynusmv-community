@@ -12,7 +12,7 @@ structure of bounded model checking instances.
     + `mathplotlib` to plot nice charts of the wordclouds and statistics
     + `wordcloud` to generate the wordcoulds that are used to analyze the communities
     + `argparse` to handle the command line arguments appropriately
-     
+    + `pymining` to mine the frequent patterns
 '''
 
 from setuptools import setup, find_packages
@@ -24,7 +24,8 @@ REQUIREMENTS = [
     'pandas',
     'matplotlib',
     'wordcloud',
-    'argparse'
+    'argparse',
+    'pymining'
 ]
 
 setup(name             = 'pynusmv-community',

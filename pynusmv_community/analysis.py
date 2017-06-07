@@ -64,6 +64,14 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     # generate the communities dump if needed
     if flags.communities:
         output.communities(model, bound, clusters, graph)
+        
+    # mine frequent_patterns
+    if flags.mine_patterns:
+        output.mine_frequent_patterns(model, bound, clusters, graph)
+    
+    # mine frequent sequences    
+    if flags.mine_sequences:
+        output.mine_frequent_sequences(model, bound, clusters, graph)
     
     return  {
             'instance'     : [model], 
