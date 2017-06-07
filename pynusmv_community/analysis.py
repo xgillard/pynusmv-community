@@ -14,6 +14,7 @@ from pynusmv_community import output
 
 IDLE = cmdline.do_nothing_flags()
 
+@cmdline.log_verbose
 def analyze_one(model, bound, formula=None, flags = IDLE):
     '''
     Analyzes the `model` for one given depth and one given `formula`. This step
@@ -59,7 +60,11 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     # generate word clouds if needed
     if flags.clouds:
         output.clouds(model, bound, clusters, graph)
-                
+    
+    # generate the communities dump if needed
+    if flags.communities:
+        output.communities(model, bound, clusters, graph)
+    
     return  {
             'instance'     : [model], 
             'bound'        : [bound],

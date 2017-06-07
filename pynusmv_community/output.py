@@ -39,10 +39,27 @@ def clouds(model, bound, clusters, graph):
     os.makedirs("{}/clouds/{:03d}".format(model, bound), exist_ok=True)
     s_cluster = [ [misc.vertex_repr(graph, v) for v in c ] for c in clusters ]
     
+    counter = 0
+    for s in s_cluster:
+        counter += 1
+        
+        # curated info
+        text = " ".join(sorted(filter(lambda x: x!="???", s)))
+        cloud= WordCloud(stopwords={},regexp=r'\w[\.\[\]\{\}\w]+').generate(text)
+        cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
+  
+def communities(model, bound, clusters, graph):
+    '''
+    Saves text file dumps for the communities stored in the `clusters` of the 
+    `graph` derived from `bound` unrolling of the time for `model`
+    '''
+    os.makedirs("{}/communities/{:03d}".format(model, bound), exist_ok=True)
+    s_cluster = [ [misc.vertex_repr(graph, v) for v in c ] for c in clusters ]
+    
     # DUMP the complete information (containing ???)
-    with open("{}/clouds/{:03d}/raw.txt".format(model, bound), 'w') as f:
+    with open("{}/communities/{:03d}/raw.txt".format(model, bound), 'w') as f:
         # But also CURATE the data to make it easier to read
-        with open("{}/clouds/{:03d}/curated.txt".format(model, bound), 'w') as c:
+        with open("{}/communities/{:03d}/curated.txt".format(model, bound), 'w') as c:
             counter = 0
             for s in s_cluster:
                 counter += 1
@@ -53,9 +70,6 @@ def clouds(model, bound, clusters, graph):
                 # curated info
                 text = " ".join(sorted(filter(lambda x: x!="???", s)))
                 print( "{:03d} -> {}\n".format(counter, text) , file=c )
-                
-                cloud= WordCloud(stopwords={},regexp=r'\w[\[\]\{\}\w]+').generate(text)
-                cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
             
 def statistics(model, frames):
     '''

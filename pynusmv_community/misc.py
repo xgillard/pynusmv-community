@@ -55,7 +55,22 @@ def short_var_repr(var):
     :param var: the `BeVar` whose short description is desired
     :return: a short string representation of the given variable
     '''
-    return "{}.at_{}".format(var.name, var.time) if var else '???'
+    import re
+    
+    # Skip the case where no var is given
+    if not var:
+        return '???'
+    
+    # recognizes a string that starts with an identifier and ends with a .digit
+    expr = re.compile('^(?P<name>[\w\.]+)\.(?P<bit>\d+)$')
+    found= expr.match( str(var.name) )
+    
+    if found:
+        name = found.group('name')
+        bit  = found.group('bit')
+        return "{}*bit_{}*at_{}".format(name, bit, var.time)
+    else:
+        return "{}*at_{}".format(var.name, var.time)
 
 ############### CONVERSIONS IGRAPH <--> PYNUSMV ###############################
 

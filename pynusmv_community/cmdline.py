@@ -45,15 +45,33 @@ def arguments():
                       default= False,
                       action = 'store_true',
                       help   = 'Generate a word cloud for each community of each instance')
+    args.add_argument("-C", "--communities",
+                      #type   = bool,
+                      default= False,
+                      action = 'store_true',
+                      help   = 'Generate 2 files with the communities analyzed (raw and curated)')
     args.add_argument("-S", "--stats",
                       #type   = bool,
                       default= False,
                       action = 'store_true',
                       help   = 'Generate statistics')
+    args.add_argument("-v", "--verbose",
+                      #type   = bool,
+                      default= False,
+                      action = 'store_true',
+                      help   = 'Verbose information during the run')
     return args.parse_args()
 
 def do_nothing_flags():
     flags = namedtuple('Flags', 'dimacs structure clouds stats')
     return flags(False, False, False, False)
     
-
+def log_verbose(func):
+    '''
+    Decorator that logs the call to a function if it is called with a keyword
+    flags which has an attribute 'verbose' set to true.
+    '''
+    def logger(*args, **kwargs):
+        print("{} | {} {}".format(func.__name__, *args, **kwargs))
+        func(*args, **kwargs)
+    return logger
