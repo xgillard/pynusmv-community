@@ -28,6 +28,6 @@ class Params:
 if __name__ == '__main__':
     model= "NMH21_2"
     path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models/nameche" 
-    args = Params(model, path_to = path, mine_patterns = True, mine_sequences = True)
+    args = Params(model, path_to = path, stats = True)
     rng  = range(args.min_bound, 1+args.max_bound)
     process(args.path_to, args.model, args.formula, rng, args)

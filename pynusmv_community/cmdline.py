@@ -90,5 +90,5 @@ def log_verbose(func):
         
         if __VERBOSE:
             print("{} | {} {}".format(func.__name__, *args, **kwargs))
-        func(*args, **kwargs)
+        return func(*args, **kwargs)
     return logger
