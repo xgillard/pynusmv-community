@@ -6,10 +6,16 @@ files for the main analysis process.
 import os
 import igraph
 import pandas
+import math
+import random
 
 from wordcloud         import WordCloud
 from pynusmv_community import misc
 
+from igraph.drawing.colors  import known_colors
+
+colors = list(known_colors.values())
+random.shuffle(colors)
 
 def dimacs(model, bound, cnf):
     '''
@@ -26,10 +32,38 @@ def structure(model, bound, clusters, graph):
     `model` unrolled `bound` times and classified in `clusters`
     '''
     os.makedirs("{}/structure/".format(model), exist_ok=True)
-    igraph.plot(clusters, 
-                layout  = graph.layout("large_graph"),
-                bbox    = (0, 0, 2400, 2400),
-                target  = "{}/structure/{:03d}.png".format(model, bound))
+    
+    # set cluster size on all vs
+    for cluster in clusters:
+        size = len(cluster)
+        for vertex in cluster:
+            graph.vs[vertex]['size'] = size
+    # set equal weight for all connections so that it becomes visible in
+    # the output diagram
+    graph.es['weight'] = [ 1 for _ in graph.es]
+    
+    cg = clusters.cluster_graph(combine_vertices={'size': 'first'},
+                                combine_edges={'weight': 'sum'})
+    
+    smallest_v   = min(cg.vs['size'])
+    normalize_v  = lambda x: x / smallest_v
+    
+    visual_style = {
+        'vertex_size' : [ int(round(normalize_v(x))) for x in cg.vs['size'] ],
+        'vertex_color': [ colors[v.index % len(colors)] for v in cg.vs ],
+        
+        'edge_width'  : [ int(1+round(math.log(x))) for x in cg.es['weight'] ],
+        'edge_color'  : [ colors[e.source % len(colors)] for e in cg.es ],
+        'edge_curved' : True,
+        
+        'target'      : "{}/structure/{:03d}.png".format(model, bound),
+        'layout'      : cg.layout("rt_circular"),
+        'bbox'        : (0, 0, 3200, 3200),
+        'margin'      : 250,
+        'background'  : (0,0,0,0)
+    }
+    
+    igraph.plot(cg, **visual_style)
   
 def communities(model, bound, clusters, graph):
     '''
