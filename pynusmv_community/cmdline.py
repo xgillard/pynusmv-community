@@ -13,62 +13,85 @@ def arguments():
         A tool to analyze the community structure of SAT BMC problem instances
     """)
     
-    args.add_argument("model",
-                      help="The model to load")
-    args.add_argument("-p", "--path-to",
-                      type = str,
-                      default = ".",
-                      help = "The path to the folder containing the 'main' module")
+    verbose           = args.add_argument("-v", "--verbose", action="store_true")
+    verbose.help      = 'Verbose information during the run'
+
+    ################## PROBLEM CONFIG #########################################
+    general           = args.add_argument_group('Problem')
+    general.help      = 'Configuration of the problem to analyze'
     
-    # The time steps to consider
-    args.add_argument("-k", "--min-bound",
-                      type=int,
-                      default=0,
-                      help="The minimal problem size")
-    args.add_argument("-K", "--max-bound",
-                      type=int,
-                      default=10,
-                      help="The maximal problem size")
+    model             = general.add_argument("model")
+    model.help        = "The model to load"
     
-    args.add_argument("-f", "--formula",
-                      help = "A formula to generate the model checking problem")
-    # Customization flags
-    args.add_argument("--dimacs",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate a DIMACS .cnf file for each instance')
-    args.add_argument("--structure",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate a variable graph for each instance')
-    args.add_argument("--clouds",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate a word cloud for each community of each instance')
-    args.add_argument("--communities",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate 2 files with the communities analyzed (raw and curated)')
-    # mining
-    args.add_argument("--mine-patterns",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate one CSV file reporting a mining of the frequent patterns observed')
-    args.add_argument("--mine-sequences",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate one CSV file reporting a mining of the frequent sequences observed')
+    path_to           = general.add_argument("--path")
+    path_to.help      = "The path to the folder containing the 'main' module"
+    path_to.default   = '.'
     
-    args.add_argument("--stats",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Generate statistics')
-    args.add_argument("-v", "--verbose",
-                      default= False,
-                      action = 'store_true',
-                      help   = 'Verbose information during the run')
+    min_bound         = general.add_argument("-k", "--min-bound", type=int)
+    min_bound.help    = "The minimal problem size"
+    min_bound.default = 0
     
-    parsed = args.parse_args()
+    max_bound         = general.add_argument("-K", "--max-bound", type=int)
+    max_bound.help    = "The maximal problem size"
+    max_bound.default = 10
+    
+    formula           = general.add_argument("-f", "--formula")
+    formula.help      = "A formula to generate the model checking problem"
+    
+    ################## DUMP COMMAND ###########################################
+    dump              = args.add_argument_group("Dump")
+    dump.help         = "Generate some raw data files about the analyzed instance(s)"
+    
+    dimacs            = dump.add_argument("--dump-cnf", action="store_true")
+    dimacs.help       = 'Generate a DIMACS .cnf file for each instance' 
+    
+    mapping           = dump.add_argument("--dump-mapping", action="store_true")
+    mapping.help      = 'Text file containing a mapping cnf var -> SMV meaning'
+    
+    commu             = dump.add_argument("--dump-communities", action="store_true")
+    commu.help        = 'Text file containing the curated communities clustering'
+    
+    commu             = dump.add_argument("--dump-raw-communities", action="store_true")
+    commu.help        = 'Text file containing the raw communities clustering'
+    
+    sem_commu         = dump.add_argument("--dump-semantic-communities", action="store_true")
+    sem_commu.help    = 'Text file containing the raw clustering reconciled with SMV'
+    
+    stats             = dump.add_argument("--dump-stats", action="store_true")
+    stats.help        = 'CSV file containing the evolution of modularity and #commu.'
+    
+    
+    ################## SHOW COMMAND ###########################################
+    show              = args.add_argument_group("Visualization")
+    show.help         = "Generate some visulization artefacts"
+    
+    dimacs            = show.add_argument("--show-vig", action="store_true")
+    dimacs.help       = 'Generate the complete VIG for each instance' 
+    
+    cluster           = show.add_argument("--show-cluster-graph", action="store_true")
+    cluster.help      = 'Generate a cluster graph, where communities are merged' 
+    
+    clouds            = show.add_argument("--show-clouds", action="store_true")
+    clouds.help       = 'Generate a word cloud for each community' 
+    
+    stats             = show.add_argument("--show-stats", action="store_true")
+    stats.help        = 'Plot the evolution of modularity and #commu.' 
+    
+    ################## MINE COMMAND ###########################################
+    mine              = args.add_argument_group("Mining")
+    mine.help         = "Mines the semantic information (SMV identifiers)"
+    
+    patterns          = mine.add_argument("--mine-patterns", action="store_true")
+    patterns.help     = 'Mine frequently occuring *patterns* with RELIM'  
+    
+    sequences         = mine.add_argument("--mine-sequences", action="store_true")
+    sequences.help    = 'Mine frequently occuring *sequences* with "a priori"' 
+    
+    return args
+
+def parse_args():
+    args              = arguments()
+    parsed            = args.parse_args()
     
     if parsed.verbose:
         global __VERBOSE
@@ -77,8 +100,10 @@ def arguments():
     return parsed
 
 def do_nothing_flags():
-    flags = namedtuple('Flags', 'dimacs structure clouds stats mine_patterns mine_sequences')
-    return flags(False, False, False, False, False, False)
+    flags = namedtuple('Flags', 'dump_cnf dump_mapping dump_communities dump_raw_communities dump_semantic_communities dump_stats '
+                              + 'show_vig show_cluster_graph show_clouds show_stats '
+                              + 'mine_patterns mine_sequences')
+    return flags(False, False, False, False, False, False, False, False, False, False, False, False)
     
 def log_verbose(func):
     '''

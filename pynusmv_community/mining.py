@@ -1,83 +1,11 @@
 '''
-*DEPRECATED*
-===========
-
-This module serves the solve purpose of gathering the functions producing output
-files for the main analysis process.
+This module contains all the mining-related functionalities. These 
+functions compute nothing per themselves (except trivial stuffs) and rely on 
+core to do the heavy lifting.
 '''
 
 import os
-import igraph
-import pandas
-import math
-import random
-
-from wordcloud         import WordCloud
 from pynusmv_community import core
-
-from igraph.drawing.colors  import known_colors
-
-colors = list(known_colors.values())
-random.shuffle(colors)
-
-        
-def structure(model, bound, clusters, graph):
-    '''
-    Saves an image representing the structure of the sat problem derived from
-    `model` unrolled `bound` times and classified in `clusters`
-    '''
-    os.makedirs("{}/structure/".format(model), exist_ok=True)
-    
-    # set cluster size on all vs
-    for cluster in clusters:
-        size = len(cluster)
-        for vertex in cluster:
-            graph.vs[vertex]['size'] = size
-    # set equal weight for all connections so that it becomes visible in
-    # the output diagram
-    graph.es['weight'] = [ 1 for _ in graph.es]
-    
-    cg = clusters.cluster_graph(combine_vertices={'size': 'first'},
-                                combine_edges={'weight': 'sum'})
-    
-    smallest_v   = min(cg.vs['size'])
-    normalize_v  = lambda x: x / smallest_v
-    
-    visual_style = {
-        'vertex_size' : [ int(round(normalize_v(x))) for x in cg.vs['size'] ],
-        'vertex_color': [ colors[v.index % len(colors)] for v in cg.vs ],
-        
-        'edge_width'  : [ int(1+round(math.log(x))) for x in cg.es['weight'] ],
-        'edge_color'  : [ colors[e.source % len(colors)] for e in cg.es ],
-        'edge_curved' : True,
-        
-        'target'      : "{}/structure/{:03d}.png".format(model, bound),
-        'layout'      : cg.layout("rt_circular"),
-        'bbox'        : (0, 0, 3200, 3200),
-        'margin'      : 250,
-        #'background'  : (0,0,0,0)
-    }
-    
-    igraph.plot(cg, **visual_style)
-
-
-def clouds(model, bound, clusters, graph):
-    '''
-    Saves the wordclouds for the communities stored in the `clusters` of the 
-    `graph` derived from `bound` unrolling of the time for `model`
-    '''
-    os.makedirs("{}/clouds/{:03d}".format(model, bound), exist_ok=True)
-    s_cluster = [ [core.vertex_repr(graph, v) for v in c ] for c in clusters ]
-    
-    counter = 0
-    for s in s_cluster:
-        counter += 1
-        
-        # curated info
-        text = " ".join(sorted(filter(lambda x: x!="???", s)))
-        cloud= WordCloud(stopwords={},regexp=r'\w[\.\[\]\{\}\w]+').generate(text)
-        cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
-
 
 def mine_frequent_patterns(model, bound, clusters, graph):
     '''
@@ -177,21 +105,3 @@ def mine_frequent_sequences(model, bound, clusters, graph):
                 text = '.'.join(items)
                 print("Community {:3d} ; {:5d} ; {}".format(counter, cnt, text), file = f)
     
-
-def statistics(model, frames):
-    '''
-    Aggregates and produces machine processable statistics from the `frames` 
-    obtained from `model`.
-    '''
-    os.makedirs("{}/stats/".format(model), exist_ok=True)
-        
-    # compute the results
-    results = pandas.concat( frames )
-    chart   = lambda z: results[['bound', z]].plot(x='bound', y=z, kind="scatter")
-    commu   = chart('#communities').get_figure()
-    modul   = chart("modularity").get_figure()
-    
-    # save 'em to file
-    results.to_csv("{}/stats/data.csv".format(model))
-    commu.savefig('{}/stats/comunities.png'.format(model))
-    modul.savefig('{}/stats/modularity.png'.format(model))

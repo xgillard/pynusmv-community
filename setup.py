@@ -38,7 +38,7 @@ setup(name             = 'pynusmv-community',
       install_requires = REQUIREMENTS,
       entry_points     = {
         'console_scripts' : [
-            'commu=pynusmv_community.analysis:main'
+            'commu=pynusmv_community.main:main'
         ] 
       },
       # TESTS

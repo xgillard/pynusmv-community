@@ -9,8 +9,11 @@ from pynusmv.glob      import load
 from pynusmv.bmc.glob  import BmcSupport
 
 from pynusmv_community import cmdline
-from pynusmv_community import misc
-from pynusmv_community import output
+from pynusmv_community import core
+from pynusmv_community import dump
+from pynusmv_community import visualization
+from pynusmv_community import mining
+
 
 IDLE = cmdline.do_nothing_flags()
 
@@ -45,38 +48,50 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
         bound and the number of communities and the graph modularity. This can
         be later collected into a dataframe to build evolution statistics
     '''
-    cnf      = misc.mk_cnf(bound, formula)
-    graph    = misc.mk_graph(cnf)
+    cnf      = core.mk_cnf(bound, formula)
+    graph    = core.mk_graph(cnf)
     clusters = graph.community_multilevel()
     
-    # generate the dimacs instance if needed
-    if flags.dimacs:
-        output.dimacs(model, bound, cnf)
-    
-    # generate the variable graph if needed
-    if flags.structure:
-        output.structure(model, bound, clusters, graph)
-    
-    # generate word clouds if needed
-    if flags.clouds:
-        output.clouds(model, bound, clusters, graph)
-    
-    # generate the communities dump if needed
-    if flags.communities:
-        output.communities(model, bound, clusters, graph)
+    # generate the dumps
+    if flags.dump_cnf:
+        dump.dimacs(model, bound, cnf)
         
+    if flags.dump_mapping:
+        dump.mapping(model, bound, cnf)
+        
+    if flags.dump_communities:
+        dump.communities_curated(model, bound, clusters, graph)
+        
+    if flags.dump_raw_communities:
+        dump.communities_raw(model, bound, clusters, graph)
+        
+    if flags.dump_semantic_communities:
+        dump.communities_semantic(model, bound, clusters, graph)
+        
+    
+    # generate the visualization artifacts
+    if flags.show_vig:
+        visualization.vig(model, bound, clusters, graph)
+        
+    if flags.show_cluster_graph:
+        visualization.cluster_graph(model, bound, clusters, graph)
+        
+    if flags.show_clouds:
+        visualization.clouds(model, bound, clusters, graph)
+    
+    
     # mine frequent_patterns
     if flags.mine_patterns:
-        output.mine_frequent_patterns(model, bound, clusters, graph)
+        mining.mine_frequent_patterns(model, bound, clusters, graph)
     
     # mine frequent sequences    
     if flags.mine_sequences:
-        output.mine_frequent_sequences(model, bound, clusters, graph)
+        mining.mine_frequent_sequences(model, bound, clusters, graph)
     
     return  {
             'instance'     : [model], 
             'bound'        : [bound],
-            '#communities' : [misc.community_count(clusters)],
+            '#communities' : [core.community_count(clusters)],
             'modularity'   : [clusters.modularity]
             }
     
@@ -113,10 +128,15 @@ def analyze_all(model, formula = None, depths = range(10), flags = IDLE):
     for bound in depths:
         record = analyze_one(model, bound, formula, flags)
         frames.append( pandas.DataFrame.from_dict(record) )
+    
+    if frames:
+        data = pandas.concat(frames)
         
-    # gather statistic data
-    if flags.stats:
-        output.statistics(model, frames)
+        if flags.dump_stats:
+            dump.statistics(model, data)
+        
+        if flags.show_stats:
+            visualization.statistics(model, data)
         
 
 def process(path_to, model, formula = None, depths = range(10), flags = IDLE):
@@ -141,7 +161,7 @@ def process(path_to, model, formula = None, depths = range(10), flags = IDLE):
     '''
     
     with init_nusmv():
-        load(misc.merge_model_text(path_to, model+".smv"))
+        load(core.merge_model_text(path_to, model+".smv"))
         
         with BmcSupport():
             analyze_all(model, formula, depths, flags)
@@ -151,9 +171,9 @@ def main():
     The main entry point of the tool. See --help for the full details of what
     it can do.
     '''
-    args = cmdline.arguments()
+    args = cmdline.parse_args()
     rng  = range(args.min_bound, 1+args.max_bound)
-    process(args.path_to, args.model, args.formula, rng, args)
+    process(args.path, args.model, args.formula, rng, args)
     
 if __name__ == "__main__":
     main()
