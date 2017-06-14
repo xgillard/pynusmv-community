@@ -60,7 +60,7 @@ def structure(model, bound, clusters, graph):
         'layout'      : cg.layout("rt_circular"),
         'bbox'        : (0, 0, 3200, 3200),
         'margin'      : 250,
-        'background'  : (0,0,0,0)
+        #'background'  : (0,0,0,0)
     }
     
     igraph.plot(cg, **visual_style)

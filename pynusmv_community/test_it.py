@@ -26,31 +26,32 @@ class Params:
         
         
 if __name__ == '__main__':
-    model= "NMH21_2"
-    path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models/nameche" 
-    prop = "G (v211.U_KM_07M.st = l -> (v211.U_07M_09M.st = l xor v211.U_07M_04M.st = l))"
-    args = Params(model, 
-                  path_to        = path,
-                  formula        = prop,
-                  min_bound      = 33, 
-                  max_bound      = 33,
-                   
-                  structure      = True,
-                  stats          = True,
-                  mine_sequences = True,
-                  verbose        = True
-                  )
+    #model= "NMH21_2"
+    #path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models/nameche" 
+    #prop = "G (v211.U_KM_07M.st = l -> (v211.U_07M_09M.st = l xor v211.U_07M_04M.st = l))"
+    #args = Params(model, 
+    #              path_to        = path,
+    #              formula        = prop,
+    #              min_bound      = 1, 
+    #              max_bound      = 100,
+    #               
+    #              #structure      = True,
+    #              stats          = True,
+    #              #mine_sequences = True,
+    #              #verbose        = True
+    #              )
     
     
-    #model= "philo_9"                                  
-    #path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models"
-    #prop = "F G (p1.waiting -> F !p1.waiting)"
-    #args = Params(model,                              
-    #              path_to   = path,                   
-    #              structure = True,                   
-    #              formula   = prop,                   
-    #              min_bound = 100,                     
-    #              max_bound = 100)                     
-    #                                                                              
+    model= "philo_9"                                  
+    path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models"
+    prop = "F G (p1.waiting -> F !p1.waiting)"
+    args = Params(model,                              
+                  path_to   = path,                   
+                  #structure = True,                   
+                  #formula   = prop,                   
+                  min_bound = 0,                     
+                  max_bound = 100, 
+                  stats     = True)                     
+                                                                                  
     rng  = range(args.min_bound, 1+args.max_bound)
     process(args.path_to, args.model, args.formula, rng, args)
