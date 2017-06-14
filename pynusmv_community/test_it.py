@@ -17,8 +17,8 @@ if __name__ == '__main__':
     #prop = "F G (p1.waiting -> F !p1.waiting)"
     
     args     = cmdline.arguments().parse_args([
-        '--path', path, '--formula', prop, '-k', '20', '-K', '20',
-        '--dump-cnf', '--dump-stats',
+        '--path', path, '--formula', prop, '-k', '10', '-K', '10',
+        '--mine-patterns', '--mine-sequences',
         '--show-cluster-graph', 
         model
         ])

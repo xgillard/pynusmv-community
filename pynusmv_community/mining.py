@@ -5,13 +5,15 @@ core to do the heavy lifting.
 '''
 
 import os
+import pandas
 from pynusmv_community import core
 
-def mine_frequent_patterns(model, bound, clusters, graph):
+def mine_frequent_patterns(clusters, graph):
     '''
     Mines the most frequent patterns in each of the `clusters` of the `graph`
     (based on their semantic value in the problem defined by `model` unrolled
-    `bound` times) and dump them to a CSV file.
+    `bound` times) and returns a pandas Dataframe representing the mined 
+    information
     
     .. note::
         Mining the patterns is somewhat weaker than mining the sequences. You
@@ -19,8 +21,6 @@ def mine_frequent_patterns(model, bound, clusters, graph):
     '''
     import re
     import pymining.itemmining as _mine
-    
-    os.makedirs("{}/mining/{:03d}".format(model, bound), exist_ok=True)
     
     # represent a vertex
     reprs= lambda v: core.vertex_repr(graph, v)
@@ -39,26 +39,29 @@ def mine_frequent_patterns(model, bound, clusters, graph):
     def _mine_by_frequence(x):
         return sorted(_do_mine(x).items(), reverse=True, key=lambda t: t[1])
     
-    with open("{}/mining/{:03d}/patterns.csv".format(model, bound), 'w') as f:
-        # print the headline
-        print('Community     ; Count ; Pattern', file = f)
-        counter = 0
-        for community in clusters :
-            counter += 1
-            for items,cnt in _mine_by_frequence(community):
-                text = ' '.join(items)
-                print("{:3d} ; {:5d} ; {}".format(counter, cnt, text), file = f)
+    counter= 0
+    frames = []
+    for community in clusters:
+        counter += 1
+        for items,cnt in _mine_by_frequence(community):
+            text = ' '.join(items)
+            frames.append(pandas.DataFrame.from_dict({
+                'CommunityNo' : [counter], 
+                'Count'       : [cnt],
+                'Pattern'     : [text]
+            }))
+    
+    return pandas.concat(frames)
 
-def mine_frequent_sequences(model, bound, clusters, graph):
+def mine_frequent_sequences(clusters, graph):
     '''
     Mines the most frequent sequences in each of the `clusters` of the `graph`
     (based on their semantic value in the problem defined by `model` unrolled
-    `bound` times) and dump them to a CSV file.
+    `bound` times) and returns a pandas DataFrame
     '''
     import re
     import pymining.seqmining as _mine
     
-    os.makedirs("{}/mining/{:03d}".format(model, bound), exist_ok=True)
     
     # represent a vertex
     reprs= lambda v: core.vertex_repr(graph, v)
@@ -89,19 +92,51 @@ def mine_frequent_sequences(model, bound, clusters, graph):
     # define what can be mined
     minable = lambda c: symbolic(trans(c))
     
-    with open("{}/mining/{:03d}/sequences.csv".format(model, bound), 'w') as f:
-        # print the headline
-        print('Community     ; Count ; Sequence', file = f)
-        counter = 0
-        for community in clusters:
-            counter    += 1
-            seqs, conv = minable(community)
-            freq_seqs  = _mine.freq_seq_enum(seqs, 2)
-            freq_seqs  = sorted(freq_seqs, reverse=True, key=lambda x: (x[1], len(x[0])))
+    counter= 0
+    frames = []
+    for community in clusters:
+        counter += 1
+        seqs, conv = minable(community)
+        freq_seqs  = _mine.freq_seq_enum(seqs, 2)
+        freq_seqs  = sorted(freq_seqs, reverse=True, key=lambda x: (x[1], len(x[0])))
             
-            # Now dump the mined information to file
-            for seq,cnt in freq_seqs:
-                items= [conv[i] for i in seq]
-                text = '.'.join(items)
-                print("Community {:3d} ; {:5d} ; {}".format(counter, cnt, text), file = f)
+        for seq,cnt in freq_seqs:
+            items= [conv[i] for i in seq]
+            text = '.'.join(items)
+            frames.append(pandas.DataFrame.from_dict({
+                'CommunityNo' : [counter], 
+                'Count'       : [cnt],
+                'Sequence'    : [text]
+            }))
+    
+    return pandas.concat(frames)
+
+
+def dump_frequent_patterns(model, bound, clusters, graph):
+    '''
+    Mines the most frequent patterns in each of the `clusters` of the `graph`
+    (based on their semantic value in the problem defined by `model` unrolled
+    `bound` times) and dumps them to CSV file
+    
+    .. note::
+        Mining the patterns is somewhat weaker than mining the sequences. You
+        might want to call that instead.
+    '''
+    os.makedirs("{}/mining/{:03d}".format(model, bound), exist_ok=True)
+    
+    data = mine_frequent_patterns(clusters, graph)
+    data.to_csv("{}/mining/{:03d}/patterns.csv".format(model, bound), sep=";")
+
+
+def dump_frequent_sequences(model, bound, clusters, graph):
+    '''
+    Mines the most frequent sequences in each of the `clusters` of the `graph`
+    (based on their semantic value in the problem defined by `model` unrolled
+    `bound` times) and dump them to a CSV file.
+    '''
+    os.makedirs("{}/mining/{:03d}".format(model, bound), exist_ok=True)
+    
+    data = mine_frequent_sequences(clusters, graph)
+    data.to_csv("{}/mining/{:03d}/sequences.csv".format(model, bound), sep=";")
+
     
