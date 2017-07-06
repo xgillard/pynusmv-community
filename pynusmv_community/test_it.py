@@ -7,19 +7,24 @@ import pynusmv_community.main    as main
  
         
 if __name__ == '__main__':
-    model= "NMH21_2"
-    path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models/nameche" 
-    prop = "G (v211.U_KM_07M.st = l -> (v211.U_07M_09M.st = l xor v211.U_07M_04M.st = l))"
+    #model= "NMH21_2"
+    #path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models/nameche" 
+    #prop = "G (v211.U_KM_07M.st = l -> (v211.U_07M_09M.st = l xor v211.U_07M_04M.st = l))"
     
     
-    #model= "philo_9"                                  
-    #path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models"
-    #prop = "F G (p1.waiting -> F !p1.waiting)"
+    model= "philo_9"                                  
+    path = "/Users/user/Documents/EXPERIMENTS/bmc_data/models"
+    prop = "F G (p1.waiting -> F !p1.waiting)"
+    
+    cmdline.__VERBOSE = True
     
     args     = cmdline.arguments().parse_args([
-        '--path', path, '--formula', prop, '-k', '10', '-K', '10',
-        '--mine-patterns', '--mine-sequences',
-        '--show-cluster-graph', 
+        '--path', path, '--formula', prop, '-k', '50', '-K', '50',
+        #'--mine-patterns', 
+        '--mine-sequences',
+        '--show-cluster-graph',
+        #'--dump-stats',
+        #'--show-stats',
         model
         ])
     

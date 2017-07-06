@@ -11,7 +11,8 @@ import igraph
 
 from wordcloud              import WordCloud 
 from pynusmv_community      import core
-from igraph.drawing.colors  import known_colors
+from igraph.drawing.colors  import known_colors, color_to_html_format
+from scipy.sparse.linalg.isolve.iterative import cg
 
 colors = list(known_colors.values())
 random.shuffle(colors)
@@ -36,16 +37,19 @@ def cluster_graph(model, bound, clusters, graph):
     '''
     os.makedirs("{}/structure/".format(model), exist_ok=True)
     
-    # set cluster size on all vs
+    # set cluster size and id on all vs
+    counter = 0
     for cluster in clusters:
-        size = len(cluster)
+        counter += 1
+        size     = len(cluster)
         for vertex in cluster:
             graph.vs[vertex]['size'] = size
+            graph.vs[vertex]['community'] = counter;
     # set equal weight for all connections so that it becomes visible in
     # the output diagram
     graph.es['weight'] = [ 1 for _ in graph.es]
     
-    cg = clusters.cluster_graph(combine_vertices={'size': 'first'},
+    cg = clusters.cluster_graph(combine_vertices={'size': 'first', 'community': 'first'},
                                 combine_edges={'weight': 'sum'})
     
     smallest_v   = min(cg.vs['size'])
@@ -60,13 +64,24 @@ def cluster_graph(model, bound, clusters, graph):
         #'edge_curved' : True,
         'auto_curve' : True,
         
-        'target'      : "{}/structure/{:03d}.png".format(model, bound),
+        'target'      : "{}/structure/{:03d}.svg".format(model, bound),
         'layout'      : cg.layout("fr"),#cg.layout("rt_circular"),
         'bbox'        : (0, 0, 3200, 3200),
         'margin'      : 250,
         #'background'  : (0,0,0,0)
+        
+        'vertex_label': [ 'commu-{:03d}'.format(c) for c in cg.vs['community'] ],
+        'shape'       : 'circle'
     }
     
+    #cg.write_svg(
+    #    fname  = "{}/structure/{:03d}.svg".format(model, bound),
+    #    labels = 'community',
+    #    #**visual_style
+    # )
+    with open("graphe.json", 'w') as f: 
+        print(core.graph_to_json(cg), file=f)
+        
     igraph.plot(cg, **visual_style)
 
 def clouds(model, bound, clusters, graph):

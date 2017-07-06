@@ -125,7 +125,7 @@ def dump_frequent_patterns(model, bound, clusters, graph):
     os.makedirs("{}/mining/{:03d}".format(model, bound), exist_ok=True)
     
     data = mine_frequent_patterns(clusters, graph)
-    data.to_csv("{}/mining/{:03d}/patterns.csv".format(model, bound), sep=";")
+    data.to_csv("{}/mining/{:03d}/patterns.csv".format(model, bound))
 
 
 def dump_frequent_sequences(model, bound, clusters, graph):
@@ -137,6 +137,6 @@ def dump_frequent_sequences(model, bound, clusters, graph):
     os.makedirs("{}/mining/{:03d}".format(model, bound), exist_ok=True)
     
     data = mine_frequent_sequences(clusters, graph)
-    data.to_csv("{}/mining/{:03d}/sequences.csv".format(model, bound), sep=";")
+    data.to_csv("{}/mining/{:03d}/sequences.csv".format(model, bound))
 
     

@@ -1,6 +1,7 @@
 '''
 This module contains some utility function that help analyze BMC instances
 '''
+import math
 
 # # PyNuSMV
 # import pynusmv.init          as _init
@@ -244,3 +245,32 @@ def community_count(clustering):
         if len(cluster) >= 2:
             nb_communities += 1
     return nb_communities
+
+def graph_to_json(graph):
+    '''
+    Generates a JSON representation of the given graph
+    '''
+    # format strings
+    v_format = '{{ "id": {}, "community": {}, "size" : {} , "normal" : {}  }}'
+    e_format = '{{ "src":{}, "dst": {}, "weight": {}, "thickness" : {} }}'
+    g_format = '{{ "nodes" : [ {} ], "edges" : [ {} ] }}'
+    
+    # Vertex specific transformations
+    v_min    = min(graph.vs['size'])
+    v_attr   = lambda v,a: graph.vs[a][v.index]
+    v_comu   = lambda v: v_attr(v, 'community')
+    v_size   = lambda v: v_attr(v, 'size')
+    v_normal = lambda v: math.sqrt( v_size(v) / v_min )
+    v_json   = lambda v: v_format.format(v_comu(v)-1, v_comu(v), v_size(v), v_normal(v))
+    
+    # Edge specific transformations
+    e_attr   = lambda e,a: graph.es[a][e.index]
+    e_weight = lambda e: e_attr(e, "weight")
+    e_json   = lambda e: e_format.format(e.source, e.target, e_weight(e), math.log(e_weight(e)) )
+    
+    vs_json  = ',\n'.join([ v_json(v) for v in graph.vs ])
+    es_json  = ',\n'.join([ e_json(e) for e in graph.es ])
+    g_json   = g_format.format(vs_json, es_json)
+    
+    return g_json
+    
