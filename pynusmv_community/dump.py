@@ -99,6 +99,8 @@ def statistics(model, data):
     data.to_csv("{}/stats/data.csv".format(model), sep=';')
 
 def json_cluster_graph(model, bound, clusters, graph):
+    os.makedirs("{}/json/{:03d}/".format(model, bound), exist_ok=True)
+    
     # set cluster size and id on all vs
     counter = 0
     for cluster in clusters:
@@ -114,5 +116,5 @@ def json_cluster_graph(model, bound, clusters, graph):
     cg = clusters.cluster_graph(combine_vertices={'size': 'first', 'community': 'first'},
                                 combine_edges={'weight': 'sum'})
     
-    with open("cluster_graph.json", 'w') as f: 
+    with open("{}/json/{:03d}/cluster_graph.json".format(model, bound), 'w') as f: 
         print(core.graph_to_json(cg), file=f)

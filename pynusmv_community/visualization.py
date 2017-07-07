@@ -4,13 +4,15 @@ functions compute nothing per themselves (except trivial stuffs) and rely on
 core to do the heavy lifting.
 '''
 
-import os 
+import os
+import shutil 
 import math
 import random
 import igraph
 
+from os.path                import abspath, join 
 from wordcloud              import WordCloud 
-from pynusmv_community      import core
+from pynusmv_community      import core, mining, dump
 from igraph.drawing.colors  import known_colors, color_to_html_format
 from scipy.sparse.linalg.isolve.iterative import cg
 
@@ -112,3 +114,22 @@ def statistics(model, data):
     
     commu.savefig('{}/stats/comunities.png'.format(model))
     modul.savefig('{}/stats/modularity.png'.format(model))
+    
+def d3_visualisation(model, bound, clusters, graph):
+    target_dir = "{}/viz/{:03d}".format(model, bound)
+    source_dir = abspath(join(__file__, '../data/visualization'))
+    
+    shutil.copytree(source_dir, target_dir)
+    os.makedirs(join(target_dir, './data/'), exist_ok=True)
+    
+    mining.dump_frequent_sequences(model, bound, clusters, graph)
+    dump.json_cluster_graph(model, bound, clusters, graph)
+    
+    shutil.move("{}/mining/{:03d}/sequences.csv".format(model, bound), 
+                "{}/viz/{:03d}/data/sequences.csv".format(model, bound))
+    
+    shutil.move("{}/json/{:03d}/cluster_graph.json".format(model, bound), 
+                "{}/viz/{:03d}/data/cluster_graph.json".format(model, bound))
+    
+    
+    

@@ -1,1 +1,1 @@
-recursive-include pynusmv_community *.py *.htm *.css *.js
+recursive-include pynusmv_community *.py *.html *.css *.js
