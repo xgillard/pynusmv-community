@@ -60,6 +60,9 @@ def arguments():
     stats             = dump.add_argument("--dump-stats", action="store_true")
     stats.help        = 'CSV file containing the evolution of modularity and #commu.'
     
+    stats             = dump.add_argument("--dump-json-cluster-graph", action="store_true")
+    stats.help        = 'JSON file containing a representation of the cluster graph'
+    
     
     ################## SHOW COMMAND ###########################################
     show              = args.add_argument_group("Visualization")

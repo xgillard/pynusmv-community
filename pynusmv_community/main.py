@@ -68,6 +68,8 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     if flags.dump_semantic_communities:
         dump.communities_semantic(model, bound, clusters, graph)
         
+    if flags.dump_json_cluster_graph:
+        dump.json_cluster_graph(model, bound, clusters, graph)
     
     # generate the visualization artifacts
     if flags.show_vig:

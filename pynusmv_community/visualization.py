@@ -79,8 +79,6 @@ def cluster_graph(model, bound, clusters, graph):
     #    labels = 'community',
     #    #**visual_style
     # )
-    with open("graphe.json", 'w') as f: 
-        print(core.graph_to_json(cg), file=f)
         
     igraph.plot(cg, **visual_style)
 
