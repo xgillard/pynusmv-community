@@ -119,7 +119,7 @@ def statistics(model, data):
     
 def d3_visualisation(model, bound, clusters, graph):
     target_dir = "{}/viz/{:03d}".format(model, bound)
-    source_dir = abspath(join(__file__, '../data/visualization'))
+    source_dir = abspath(join(__file__, '../data/graph_vis'))
     
     shutil.rmtree(target_dir, ignore_errors=True)
     shutil.copytree(source_dir, target_dir)
@@ -141,11 +141,11 @@ def table_visualisation(model, bound, clusters, graph):
     time_frames   = range(-1, bound+1)
     
     dataframe     = pd.DataFrame(index  = pd.Series( semantic_vars ), 
-                                 columns= pd.Series(time_frames) )
+                                 columns= pd.Series(time_frames))
     
     for v in semantic_vars: 
         for f in time_frames:
-            dataframe.loc[v][f] = []
+            dataframe.loc[v][f] = set()
     
     counter = 0
     for community in clusters:
@@ -159,9 +159,26 @@ def table_visualisation(model, bound, clusters, graph):
                 var_name = var_info[0]
                 var_block= int( var_info[-1].split("_")[-1] )
                 
-                dataframe.loc[var_name][var_block].append(counter)
+                dataframe.loc[var_name][var_block].add(counter)
     
-    with open("test.html", "w") as f:
-        print(dataframe.to_html(), file=f)
+    #with open("test.html", "w") as f:
+    #    print(dataframe.to_html(), file=f)
+        
+    with open("test.json", "w") as f:
+        print('''
+            {{
+            "model" : "{}",
+            "bound" : {},
+            "communities": {},
+            "data": {} 
+            }}
+            '''.format(
+                model, 
+                bound, 
+                list( range(1, len(clusters)+1) ), 
+                dataframe.to_json(orient='index')
+            ),   
+            file=f
+        )
         
     return dataframe
