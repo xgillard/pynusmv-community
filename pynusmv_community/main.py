@@ -8,7 +8,7 @@ from pynusmv.init      import init_nusmv
 from pynusmv.glob      import load
 from pynusmv.bmc.glob  import BmcSupport
 
-from pynusmv_community import cmdline
+from pynusmv_community import cmdline, visualization
 from pynusmv_community import core
 from pynusmv_community import dump
 from pynusmv_community import visualization
@@ -51,6 +51,10 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     cnf      = core.mk_cnf(bound, formula)
     graph    = core.mk_graph(cnf)
     clusters = graph.community_multilevel()
+    
+    
+    #
+    visualization.table_visualisation(model, bound, clusters, graph)
     
     # generate the dumps
     if flags.dump_cnf:

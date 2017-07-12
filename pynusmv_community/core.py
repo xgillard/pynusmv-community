@@ -73,6 +73,7 @@ def short_var_repr(var):
     else:
         return "{}*at_{}".format(var.name, var.time)
 
+
 ############### CONVERSIONS IGRAPH <--> PYNUSMV ###############################
 
 def vertex_to_lit(graph, vertex):
@@ -103,6 +104,20 @@ def vertex_repr(graph, vertex):
         the `vertex` in the `graph`
     '''
     return short_var_repr(vertex_to_be_var(graph, vertex))
+
+def semantic_vars(graph):
+    '''
+    Lists all the semantic variables that intervene in the problem.
+    '''
+    result = set()
+    for vertex in graph.vs:
+        literal= vertex['lit']
+        be_var = cnf_to_be_var(literal)
+        repres = short_var_repr(be_var)
+        name   = repres.split(sep="*")[0]
+        result.add(name)
+        
+    return sorted( list( result ) )
 
 ############### GENERATION UTILS #############################################
 

@@ -23,7 +23,7 @@ if __name__ == '__main__':
         #'--mine-patterns', 
         #'--mine-sequences',
         #'--show-cluster-graph',
-        '--dump-json-cluster-graph',
+        #'--dump-json-cluster-graph',
         #'--dump-stats',
         #'--show-stats',
         model

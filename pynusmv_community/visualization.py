@@ -10,6 +10,8 @@ import math
 import random
 import igraph
 
+import pandas as pd
+
 from os.path                import abspath, join 
 from wordcloud              import WordCloud 
 from pynusmv_community      import core, mining, dump
@@ -119,6 +121,7 @@ def d3_visualisation(model, bound, clusters, graph):
     target_dir = "{}/viz/{:03d}".format(model, bound)
     source_dir = abspath(join(__file__, '../data/visualization'))
     
+    shutil.rmtree(target_dir, ignore_errors=True)
     shutil.copytree(source_dir, target_dir)
     os.makedirs(join(target_dir, './data/'), exist_ok=True)
     
@@ -131,5 +134,34 @@ def d3_visualisation(model, bound, clusters, graph):
     shutil.move("{}/json/{:03d}/cluster_graph.json".format(model, bound), 
                 "{}/viz/{:03d}/data/cluster_graph.json".format(model, bound))
     
+
+def table_visualisation(model, bound, clusters, graph):
     
+    semantic_vars = core.semantic_vars(graph)
+    time_frames   = range(-1, bound+1)
     
+    dataframe     = pd.DataFrame(index  = pd.Series( semantic_vars ), 
+                                 columns= pd.Series(time_frames) )
+    
+    for v in semantic_vars: 
+        for f in time_frames:
+            dataframe.loc[v][f] = []
+    
+    counter = 0
+    for community in clusters:
+        counter += 1
+        
+        for vertex in community:
+            variable = core.vertex_repr(graph, vertex)
+            
+            if( variable != '???' ):
+                var_info = variable.split("*")
+                var_name = var_info[0]
+                var_block= int( var_info[-1].split("_")[-1] )
+                
+                dataframe.loc[var_name][var_block].append(counter)
+    
+    with open("test.html", "w") as f:
+        print(dataframe.to_html(), file=f)
+        
+    return dataframe
