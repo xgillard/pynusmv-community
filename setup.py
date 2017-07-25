@@ -25,7 +25,8 @@ REQUIREMENTS = [
     'matplotlib',
     'wordcloud',
     'argparse',
-    'pymining'
+    'pymining',
+    'concepts'
 ]
 
 setup(name             = 'pynusmv-community',

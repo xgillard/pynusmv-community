@@ -53,8 +53,12 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     clusters = graph.community_multilevel()
     
     
-    #
-    visualization.table_visualisation(model, bound, clusters, graph)
+    #TODO: make a flag for it
+    if False: 
+        visualization.table_visualisation(model, bound, clusters, graph)
+    
+    mining.mine_concept(model, bound, clusters, graph)
+    
     
     # generate the dumps
     if flags.dump_cnf:
