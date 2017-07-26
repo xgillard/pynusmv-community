@@ -74,6 +74,15 @@ def arguments():
     cluster           = show.add_argument("--show-cluster-graph", action="store_true")
     cluster.help      = 'Generate a cluster graph, where communities are merged' 
     
+    d3_cluster        = show.add_argument("--show-d3-cluster-graph", action="store_true")
+    d3_cluster.help   = 'Generates a d3 graph based visualisation of the problem' 
+    
+    time_table        = show.add_argument("--show-time-table", action="store_true")
+    time_table.help   = 'Generates a d3 time/table based visualisation of the problem (very useful!)'
+    
+    fca_concepts      = show.add_argument("--show-formal-concepts", action="store_true")
+    fca_concepts.help = 'Shows the concepts that could be mined in each of the communities using formal concept analysis'
+    
     clouds            = show.add_argument("--show-clouds", action="store_true")
     clouds.help       = 'Generate a word cloud for each community' 
     
@@ -104,9 +113,9 @@ def parse_args():
 
 def do_nothing_flags():
     flags = namedtuple('Flags', 'dump_cnf dump_mapping dump_communities dump_raw_communities dump_semantic_communities dump_stats '
-                              + 'show_vig show_cluster_graph show_clouds show_stats '
+                              + 'show_vig show_cluster_graph show_d3_cluster_graph showw_time_table show_formal_concepts show_clouds show_stats '
                               + 'mine_patterns mine_sequences')
-    return flags(False, False, False, False, False, False, False, False, False, False, False, False)
+    return flags(False, False, False, False, False, False, False, False, False, False, False, False, False, False, False)
     
 def log_verbose(func):
     '''

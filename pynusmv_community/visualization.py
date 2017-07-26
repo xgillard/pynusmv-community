@@ -118,7 +118,15 @@ def statistics(model, data):
     modul.savefig('{}/stats/modularity.png'.format(model))
     
 def d3_visualisation(model, bound, clusters, graph):
-    target_dir = "{}/viz/{:03d}".format(model, bound)
+    '''
+    Generates a d3 graph based visualisation of the problem.
+    This mainly helps in visualizing the cluster graph (rather than the VIG).
+    
+    .. note::
+        This feature is *experimental* and I found it not very helpful to 
+        understand the meaning of the communities.
+    '''
+    target_dir = "{}/d3_graph_vis/{:03d}".format(model, bound)
     source_dir = abspath(join(__file__, '../data/graph_vis'))
     
     shutil.rmtree(target_dir, ignore_errors=True)
@@ -128,15 +136,30 @@ def d3_visualisation(model, bound, clusters, graph):
     mining.dump_frequent_sequences(model, bound, clusters, graph)
     dump.json_cluster_graph(model, bound, clusters, graph)
     
-    shutil.move("{}/mining/{:03d}/sequences.csv".format(model, bound), 
-                "{}/viz/{:03d}/data/sequences.csv".format(model, bound))
+    shutil.copy("{}/mining/{:03d}/sequences.csv".format(model, bound), 
+                "{}/d3_graph_vis/{:03d}/data/sequences.csv".format(model, bound))
     
-    shutil.move("{}/json/{:03d}/cluster_graph.json".format(model, bound), 
-                "{}/viz/{:03d}/data/cluster_graph.json".format(model, bound))
+    shutil.copy("{}/json/{:03d}/cluster_graph.json".format(model, bound), 
+                "{}/d3_graph_vis/{:03d}/data/cluster_graph.json".format(model, bound))
     
 
 def table_visualisation(model, bound, clusters, graph):
+    '''
+    Generates a d3 table based visualisation of the problem.
+    This helps in plotting what is part of each community and get a sense of
+    the temporal (and semantic) information hidden in the various communities. 
+    '''
+    ########### PREPPING THE OUTPUT ##########################################
+    target_dir = "{}/table_vis/{:03d}".format(model, bound)
+    source_dir = abspath(join(__file__, '../data/table_vis'))
     
+    shutil.rmtree(target_dir, ignore_errors=True)
+    shutil.copytree(source_dir, target_dir)
+    os.makedirs(join(target_dir, './data/'), exist_ok=True)
+    
+    ########### ACTUALLY START GENERATING THE DATA ###########################
+    ## Note: this could be moved to dump module
+    ####
     semantic_vars = core.semantic_vars(graph)
     time_frames   = range(-1, bound+1)
     
@@ -161,10 +184,8 @@ def table_visualisation(model, bound, clusters, graph):
                 
                 dataframe.loc[var_name][var_block].add(counter)
     
-    #with open("test.html", "w") as f:
-    #    print(dataframe.to_html(), file=f)
-        
-    with open("test.json", "w") as f:
+    
+    with open(join(target_dir, './data/test.json'), "w") as f:
         print('''
             {{
             "model" : "{}",

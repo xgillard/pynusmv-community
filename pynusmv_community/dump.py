@@ -99,6 +99,13 @@ def statistics(model, data):
     data.to_csv("{}/stats/data.csv".format(model), sep=';')
 
 def json_cluster_graph(model, bound, clusters, graph):
+    '''
+    Dumps a json file containing information to visualize the cluster graph.
+    
+    .. note:: 
+        This is thightly connected to the `d3_visualisation` feature present
+        in the visualisation module.
+    '''
     os.makedirs("{}/json/{:03d}/".format(model, bound), exist_ok=True)
     
     # set cluster size and id on all vs

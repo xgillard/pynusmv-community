@@ -52,14 +52,6 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     graph    = core.mk_graph(cnf)
     clusters = graph.community_multilevel()
     
-    
-    #TODO: make a flag for it
-    if False: 
-        visualization.table_visualisation(model, bound, clusters, graph)
-    
-    mining.mine_concept(model, bound, clusters, graph)
-    
-    
     # generate the dumps
     if flags.dump_cnf:
         dump.dimacs(model, bound, cnf)
@@ -78,8 +70,7 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
         
     if flags.dump_json_cluster_graph:
         dump.json_cluster_graph(model, bound, clusters, graph)
-        #
-        visualization.d3_visualisation(model, bound, clusters, graph)
+
     
     # generate the visualization artifacts
     if flags.show_vig:
@@ -87,10 +78,18 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
         
     if flags.show_cluster_graph:
         visualization.cluster_graph(model, bound, clusters, graph)
+    
+    if flags.show_d3_cluster_graph: 
+        visualization.d3_visualisation(model, bound, clusters, graph)
         
     if flags.show_clouds:
         visualization.clouds(model, bound, clusters, graph)
     
+    if flags.show_time_table:
+        visualization.table_visualisation(model, bound, clusters, graph)
+    
+    if flags.show_formal_concepts:
+        mining.mine_concept(model, bound, clusters, graph)
     
     # mine frequent_patterns
     if flags.mine_patterns:

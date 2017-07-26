@@ -173,7 +173,5 @@ def mine_concept(model, bound, clusters, graph):
         named    = [str(lit) for lit in literals if name_of(lit) != '???' ]
         print("{:3d} | {} ".format( i, c.intension( named ) ))
     
-    c.lattice.graphviz(filename="test.png", view=True)
-    
     return c
     
