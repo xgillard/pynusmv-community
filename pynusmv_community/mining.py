@@ -9,6 +9,7 @@ import pandas
 import concepts
 
 from pynusmv_community import core
+from pynusmv_community.core import graph_to_fca_context
 
 def mine_frequent_patterns(clusters, graph):
     '''
@@ -146,32 +147,14 @@ def mine_concept(model, bound, clusters, graph):
     Applies formal concept analysis to reveal the concepts hidden in the
     various communities.
     '''
-    
-    def name_of(lit):
-        be_var = core.cnf_to_be_var(lit)
-        repres = core.short_var_repr(be_var)
-        return repres
-    
-    d = concepts.Definition()
-    
-    for vertex in graph.vs:
-        literal= vertex['lit']
-        be_var = core.cnf_to_be_var(literal)
-        repres = core.short_var_repr(be_var)
-        
-        var_info   = repres.split(sep="*")
-        var_name   = var_info[0]
-        var_block  = var_info[-1]
-        var_tokens = var_name.split(sep=".")
-        
-        d.add_object(str(literal), var_tokens + [var_block] )
-    
-    c = concepts.Context(*d)
+    c = core.graph_to_fca_context(graph)
     
     for i in range( len(clusters) ):
-        literals = [graph.vs[x]['lit'] for x in clusters[i] ]
-        named    = [str(lit) for lit in literals if name_of(lit) != '???' ]
+        named    = [str(vertex) for vertex in clusters[i] if core.vertex_repr(graph, vertex) != '???' ]
         print("{:3d} | {} ".format( i, c.intension( named ) ))
     
+    
+    #print(c)
+    c.lattice.graphviz(view=True)
     return c
     

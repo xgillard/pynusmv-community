@@ -2,6 +2,7 @@
 This module contains some utility function that help analyze BMC instances
 '''
 import math
+import concepts
 
 # # PyNuSMV
 # import pynusmv.init          as _init
@@ -289,3 +290,23 @@ def graph_to_json(graph):
     
     return g_json
     
+def graph_to_fca_context(graph, tokenize=True):
+    '''
+    
+    '''
+    d = concepts.Definition()
+    
+    for vertex in range(len(graph.vs)):
+        repres = vertex_repr(graph, vertex)
+        
+        var_info   = repres.split(sep="*")
+        var_name   = var_info[0]
+        var_block  = var_info[-1]
+        
+        if tokenize:
+            var_tokens = var_name.split(sep=".")
+            d.add_object(str(vertex), var_tokens + [var_block] )
+        else:
+            d.add_object(str(vertex), [var_name, var_block] )
+    
+    return concepts.Context(*d)
