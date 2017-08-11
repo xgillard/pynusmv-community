@@ -292,7 +292,14 @@ def graph_to_json(graph):
     
 def graph_to_fca_context(graph, tokenize=True):
     '''
+    Uses the given `graph` to generate an FCA context. 
+    This feature is useful when you want to apply formal concept analysis
+    to detect the possible semantic meaning of the the community structure of
+    a bounded model checking problem instance.
     
+    :param graph: the graph to use to produce the FCA context
+    :param tokenize: split the semantic names into token (increases the chances
+        of fca finding something interesting)
     '''
     d = concepts.Definition()
     
