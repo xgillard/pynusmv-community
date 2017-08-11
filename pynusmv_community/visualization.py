@@ -13,7 +13,6 @@ import igraph
 import pandas as pd
 
 from os.path                import abspath, join 
-from wordcloud              import WordCloud 
 from pynusmv_community      import core, mining, dump
 from igraph.drawing.colors  import known_colors#, color_to_html_format
 #from scipy.sparse.linalg.isolve.iterative import cg
@@ -86,22 +85,6 @@ def cluster_graph(model, bound, clusters, graph):
         
     igraph.plot(cg, **visual_style)
 
-def clouds(model, bound, clusters, graph):
-    '''
-    Saves the wordclouds for the communities stored in the `clusters` of the 
-    `graph` derived from `bound` unrolling of the time for `model`
-    '''
-    os.makedirs("{}/clouds/{:03d}".format(model, bound), exist_ok=True)
-    s_cluster = [ [core.vertex_repr(graph, v) for v in c ] for c in clusters ]
-    
-    counter = 0
-    for s in s_cluster:
-        counter += 1
-        
-        # curated info
-        text = " ".join(sorted(filter(lambda x: x!="???", s)))
-        cloud= WordCloud(stopwords={},regexp=r'\w[\.\[\]\{\}\w]+').generate(text)
-        cloud.to_file("{}/clouds/{:03d}/{:03d}.png".format(model, bound, counter))
 
 def statistics(model, data):
     '''
