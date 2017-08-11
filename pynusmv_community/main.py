@@ -30,6 +30,9 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
            representation of the problem
         + 'structure = True' will produce a *.png file visually representing the 
            variable graph.
+        + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
+           community to show the semantic information that occurs the most often
+           in that community.
            
     .. note::
         It is assumed that pynusmv is initialized, the model is loaded and 
@@ -78,6 +81,9 @@ def analyze_one(model, bound, formula=None, flags = IDLE):
     
     if flags.show_d3_cluster_graph: 
         visualization.d3_visualisation(model, bound, clusters, graph)
+        
+    if flags.show_clouds:
+        visualization.clouds(model, bound, clusters, graph)
     
     if flags.show_time_table:
         visualization.table_visualisation(model, bound, clusters, graph)
@@ -111,6 +117,9 @@ def analyze_all(model, formula = None, depths = range(10), flags = IDLE):
            representation of the problem
         + 'structure = True' will produce a *.png file visually representing the 
            variable graph.
+        + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
+           community to show the semantic information that occurs the most often
+           in that community.
         + 'stats  = True' will produce a csv file containing all the raw 
            statistical data alongside with two charts plotting the evolution of
            the #communities and modulatity over time
@@ -154,6 +163,9 @@ def process(path_to, model, formula = None, depths = range(10), flags = IDLE):
            representation of the problem
         + 'structure = True' will produce a *.png file visually representing the 
            variable graph.
+        + 'clouds = True' will produce a wordcloud (*.png file) per analyzed
+           community to show the semantic information that occurs the most often
+           in that community.
         + 'stats  = True' will produce a csv file containing all the raw 
            statistical data alongside with two charts plotting the evolution of
            the #communities and modulatity over time

@@ -153,6 +153,6 @@ def mine_concept(model, bound, clusters, graph):
     
     
     #print(c)
-    #c.lattice.graphviz(view=True)
+    c.lattice.graphviz(view=True)
     return c
     
