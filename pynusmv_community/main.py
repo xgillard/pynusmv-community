@@ -8,7 +8,7 @@ from pynusmv.init      import init_nusmv
 from pynusmv.glob      import load
 from pynusmv.bmc.glob  import BmcSupport
 
-from pynusmv_community import cmdline, visualization
+from pynusmv_community import cmdline
 from pynusmv_community import core
 from pynusmv_community import dump
 from pynusmv_community import visualization

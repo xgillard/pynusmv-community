@@ -15,8 +15,8 @@ import pandas as pd
 from os.path                import abspath, join 
 from wordcloud              import WordCloud 
 from pynusmv_community      import core, mining, dump
-from igraph.drawing.colors  import known_colors, color_to_html_format
-from scipy.sparse.linalg.isolve.iterative import cg
+from igraph.drawing.colors  import known_colors#, color_to_html_format
+#from scipy.sparse.linalg.isolve.iterative import cg
 
 colors = list(known_colors.values())
 random.shuffle(colors)

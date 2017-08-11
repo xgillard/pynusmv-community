@@ -6,10 +6,8 @@ core to do the heavy lifting.
 
 import os
 import pandas
-import concepts
 
 from pynusmv_community import core
-from pynusmv_community.core import graph_to_fca_context
 
 def mine_frequent_patterns(clusters, graph):
     '''

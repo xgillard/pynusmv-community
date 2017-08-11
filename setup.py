@@ -7,7 +7,7 @@ structure of bounded model checking instances.
 
     + `pynusmv` to process NuSMV models and generate the BMC instances
     + `python-igraph` to produce and analyze graphs (ie. compute q-score)
-    + `pycairo` to be able to render the graphs and save them to file
+    + `pycairo` to be able to render the graphs and save them to file (provided through cairocffi)
     + `pandas` to analyze the statistics gathered
     + `mathplotlib` to plot nice charts of the wordclouds and statistics
     + `wordcloud` to generate the wordcoulds that are used to analyze the communities
@@ -20,7 +20,7 @@ from setuptools import setup, find_packages
 REQUIREMENTS = [
     'pynusmv',
     'python-igraph',
-    #'pycairo',
+    'cairocffi',#'pycairo', -- see https://stackoverflow.com/questions/12072093/python-igraph-plotting-not-available
     'pandas',
     'matplotlib',
     'wordcloud',
@@ -41,6 +41,20 @@ setup(name             = 'pynusmv-community',
         'console_scripts' : [
             'commu=pynusmv_community.main:main'
         ] 
+      },
+      package_data     = {
+          'pynusmv_community' : ['data/graph_vis/index.html',
+                                 'data/graph_vis/main.js',
+                                 'data/graph_vis/data/*',
+                                 'data/graph_vis/lib/*.js',
+                                 'data/graph_vis/styles/*.css',
+                                 
+                                 'data/table_vis/index.html',
+                                 'data/table_vis/main.js',
+                                 'data/table_vis/data/*',
+                                 'data/table_vis/lib/*.js',
+                                 'data/table_vis/styles/*.css',
+                                ]
       },
       # TESTS
       test_suite       = 'nose.collector',

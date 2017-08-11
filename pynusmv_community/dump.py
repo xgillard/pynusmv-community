@@ -49,7 +49,7 @@ def communities_raw(model, bound, clusters, graph):
         for l in l_cluster:
             counter += 1
             # raw information
-            text = " ".join(sorted(l))
+            text = " ".join([str(x) for x in sorted(l)])
             print( "{:03d} -> {}\n".format(counter, text) , file=f )
 
 
